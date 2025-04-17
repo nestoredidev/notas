@@ -5,23 +5,24 @@ import Input from '@/components/ui/Input'
 import Label from '@/components/ui/Label'
 import ThemeSwitcher from '@/components/ui/ThemeSwitcher'
 import { useAuth } from '@/hooks/useAuth'
-import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import React, { useState, useEffect } from 'react'
 
-function Login() {
-	const { signIn } = useAuth()
+function ResetPassword() {
+	const { supabase } = useAuth()
 	const router = useRouter()
 	const searchParams = useSearchParams()
 	const [loading, setLoading] = useState(false)
 	const [error, setError] = useState<string | null>(null)
 	const [success, setSuccess] = useState<string | null>(null)
 
-	// Verificar si viene de registro exitoso
+	// Verificar que el enlace contiene el token necesario
 	useEffect(() => {
-		const registered = searchParams.get('registered')
-		if (registered === 'true') {
-			setSuccess('Registro exitoso. Por favor inicia sesión.')
+		const token = searchParams.get('token')
+		if (!token) {
+			setError(
+				'Enlace inválido. Por favor solicita un nuevo enlace para restablecer tu contraseña.'
+			)
 		}
 	}, [searchParams])
 
@@ -31,24 +32,36 @@ function Login() {
 		setError(null)
 
 		const formData = new FormData(e.currentTarget)
-		const email = formData.get('email') as string
 		const password = formData.get('password') as string
+		const confirmPassword = formData.get('confirmPassword') as string
+
+		// Validar que las contraseñas coincidan
+		if (password !== confirmPassword) {
+			setError('Las contraseñas no coinciden')
+			setLoading(false)
+			return
+		}
 
 		try {
-			const { error } = await signIn(email, password)
+			// Usar el método de Supabase para actualizar contraseña
+			const { error } = await supabase.auth.updateUser({ password })
 
 			if (error) {
-				setError(error.message)
-			} else {
-				// Inicio de sesión exitoso, redirigir al dashboard
-				router.push('/')
+				throw error
 			}
+
+			setSuccess('Tu contraseña ha sido actualizada correctamente')
+
+			// Redirigir al login después de 3 segundos
+			setTimeout(() => {
+				router.push('/login')
+			}, 3000)
 		} catch (err: unknown) {
-			if (err instanceof Error) {
-				setError(err.message || 'Error al iniciar sesión')
-			} else {
-				setError('Error al iniciar sesión')
-			}
+			setError(
+				err instanceof Error
+					? err.message
+					: 'Error al restablecer la contraseña'
+			)
 		} finally {
 			setLoading(false)
 		}
@@ -62,7 +75,7 @@ function Login() {
 
 			<div className='max-w-md w-full mx-auto'>
 				<h3 className='text-center text-3xl font-bold mb-8 text-cyan-700 dark:text-cyan-200'>
-					Ingresar
+					Nueva Contraseña
 				</h3>
 
 				{error && (
@@ -81,59 +94,47 @@ function Login() {
 					className='flex flex-col gap-6 p-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 transition-colors'
 					onSubmit={handleSubmit}
 				>
+					<p className='text-gray-600 dark:text-gray-300 text-sm text-center'>
+						Ingresa tu nueva contraseña
+					</p>
+
 					<div className='flex flex-col gap-2'>
-						<Label label='Correo electrónico' />
+						<Label label='Nueva contraseña' />
 						<Input
-							label='Ingrese su correo'
-							name='email'
-							id='email'
-							type='email'
-							autoComplete='email'
+							label='Contraseña'
+							name='password'
+							id='password'
+							type='password'
+							autoComplete='new-password'
 							required
+							minLength={8}
 						/>
 					</div>
 
 					<div className='flex flex-col gap-2'>
-						<div className='flex justify-between'>
-							<Label label='Contraseña' />
-							<Link href='/forgot-password'>
-								<span className='text-sm text-cyan-600 hover:text-cyan-700 dark:text-cyan-400 dark:hover:text-cyan-300'>
-									¿Olvidó su contraseña?
-								</span>
-							</Link>
-						</div>
+						<Label label='Confirmar contraseña' />
 						<Input
-							label='Ingrese su contraseña'
-							name='password'
-							id='password'
+							label='Confirma tu contraseña'
+							name='confirmPassword'
+							id='confirmPassword'
 							type='password'
-							autoComplete='current-password'
+							autoComplete='new-password'
 							required
+							minLength={8}
 						/>
 					</div>
 
 					<div className='mt-2'>
 						<Button
-							label={loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+							label={loading ? 'Actualizando...' : 'Actualizar contraseña'}
 							type='submit'
 							disabled={loading}
 						/>
 					</div>
 				</form>
-
-				<div className='flex items-center justify-center mt-6 space-x-2'>
-					<span className='text-gray-600 dark:text-gray-300'>
-						¿No tienes cuenta?
-					</span>
-					<Link href='/register'>
-						<span className='text-cyan-600 font-semibold hover:text-cyan-700 dark:text-cyan-400 dark:hover:text-cyan-300'>
-							Registrarse
-						</span>
-					</Link>
-				</div>
 			</div>
 		</Content>
 	)
 }
 
-export default Login
+export default ResetPassword
