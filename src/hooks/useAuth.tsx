@@ -31,27 +31,32 @@ export function useAuth() {
 				const {
 					data: { session },
 				} = await supabase.auth.getSession()
-				setUser(session?.user || null)
-			} catch (err: unknown) {
+
+				if (session) {
+					// Guardar la sesión
+					setUser(session.user)
+				} else {
+					setUser(null)
+				}
+			} catch (err) {
 				setError({
 					message: (err as Error)?.message || 'Error al verificar sesión',
 				})
+				setUser(null)
 			} finally {
 				setLoading(false)
 			}
 		}
 
-		// Listener para cambios en el estado de autenticación
+		checkSession()
+
+		// También suscribirse a cambios en la autenticación
 		const {
 			data: { subscription },
 		} = supabase.auth.onAuthStateChange((_event, session) => {
 			setUser(session?.user || null)
-			setLoading(false)
 		})
 
-		checkSession()
-
-		// Limpieza al desmontar
 		return () => {
 			subscription.unsubscribe()
 		}
