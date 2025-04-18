@@ -115,7 +115,7 @@ function Register() {
 					<span className='text-gray-600 dark:text-gray-300'>
 						¿Ya tienes cuenta?
 					</span>
-					<Link href='/login'>
+					<Link href='/auth/login'>
 						<span className='text-cyan-600 font-semibold hover:text-cyan-700 dark:text-cyan-400 dark:hover:text-cyan-300'>
 							Iniciar sesión
 						</span>

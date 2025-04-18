@@ -81,7 +81,7 @@ function Login() {
 					<div className='flex flex-col gap-2'>
 						<div className='flex justify-between'>
 							<Label label='Contraseña' />
-							<Link href='/forgot-password'>
+							<Link href='/auth/forgot-password'>
 								<span className='text-sm text-cyan-600 hover:text-cyan-700 dark:text-cyan-400 dark:hover:text-cyan-300'>
 									¿Olvidó su contraseña?
 								</span>
@@ -110,7 +110,7 @@ function Login() {
 					<span className='text-gray-600 dark:text-gray-300'>
 						¿No tienes cuenta?
 					</span>
-					<Link href='/register'>
+					<Link href='/auth/register'>
 						<span className='text-cyan-600 font-semibold hover:text-cyan-700 dark:text-cyan-400 dark:hover:text-cyan-300'>
 							Registrarse
 						</span>
