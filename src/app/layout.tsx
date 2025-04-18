@@ -12,6 +12,7 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
 	title: 'Notas',
 	description: 'Notas web app',
+	icons: '/note.svg',
 }
 
 export default function RootLayout({
