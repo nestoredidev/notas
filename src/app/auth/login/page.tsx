@@ -6,24 +6,15 @@ import Label from '@/components/ui/Label'
 import ThemeSwitcher from '@/components/ui/ThemeSwitcher'
 import { useAuth } from '@/hooks/useAuth'
 import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
-import React, { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import React, { useState } from 'react'
 
 function Login() {
 	const { signIn } = useAuth()
 	const router = useRouter()
-	const searchParams = useSearchParams()
+
 	const [loading, setLoading] = useState(false)
 	const [error, setError] = useState<string | null>(null)
-	const [success, setSuccess] = useState<string | null>(null)
-
-	// Verificar si viene de registro exitoso
-	useEffect(() => {
-		const registered = searchParams.get('registered')
-		if (registered === 'true') {
-			setSuccess('Registro exitoso. Por favor inicia sesión.')
-		}
-	}, [searchParams])
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
@@ -68,12 +59,6 @@ function Login() {
 				{error && (
 					<div className='mb-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-800 text-red-700 dark:text-red-300 rounded'>
 						{error}
-					</div>
-				)}
-
-				{success && (
-					<div className='mb-4 p-3 bg-green-100 dark:bg-green-900/30 border border-green-400 dark:border-green-800 text-green-700 dark:text-green-300 rounded'>
-						{success}
 					</div>
 				)}
 

@@ -5,26 +5,16 @@ import Input from '@/components/ui/Input'
 import Label from '@/components/ui/Label'
 import ThemeSwitcher from '@/components/ui/ThemeSwitcher'
 import { useAuth } from '@/hooks/useAuth'
-import { useRouter, useSearchParams } from 'next/navigation'
-import React, { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import React, { useState } from 'react'
 
 function ResetPassword() {
 	const { supabase } = useAuth()
 	const router = useRouter()
-	const searchParams = useSearchParams()
+
 	const [loading, setLoading] = useState(false)
 	const [error, setError] = useState<string | null>(null)
 	const [success, setSuccess] = useState<string | null>(null)
-
-	// Verificar que el enlace contiene el token necesario
-	useEffect(() => {
-		const token = searchParams.get('token')
-		if (!token) {
-			setError(
-				'Enlace inválido. Por favor solicita un nuevo enlace para restablecer tu contraseña.'
-			)
-		}
-	}, [searchParams])
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
